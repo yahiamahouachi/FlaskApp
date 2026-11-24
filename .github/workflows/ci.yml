@@ -25,7 +25,24 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run unit tests
+        id: tests
         run: python -m pytest -v
+
+      - name: Send failure notification
+        if: failure() && steps.tests.outcome == 'failure' && github.event_name == 'push'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          subject: FlaskApp CI - Tests Failed
+          to: ${{ secrets.MAIL_TO }}
+          from: ${{ secrets.MAIL_USERNAME }}
+          body: |
+            The automated tests for FlaskApp have failed.
+            Please check your GitHub Actions pipeline.
 
   docker-build:
     runs-on: ubuntu-latest
@@ -70,6 +87,7 @@ jobs:
         run: |
           docker tag flaskapp yahiamahouachi/flaskapp:latest
           docker push yahiamahouachi/flaskapp:latest
+
       - name: Login to private registry
         if: false
         uses: docker/login-action@v3
