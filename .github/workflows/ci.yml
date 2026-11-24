@@ -70,3 +70,16 @@ jobs:
         run: |
           docker tag flaskapp yahiamahouachi/flaskapp:latest
           docker push yahiamahouachi/flaskapp:latest
+      - name: Login to private registry
+        if: false
+        uses: docker/login-action@v3
+        with:
+          registry: registry.example.com
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Push to private registry
+        if: false
+        run: |
+          docker tag flaskapp registry.example.com/flaskapp:latest
+          docker push registry.example.com/flaskapp:latest
